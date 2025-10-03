@@ -1,0 +1,31 @@
+name: CI with Caching
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        id: cache-de91389
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: cache-de91389-${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            cache-de91389-${{ runner.os }}-pip-
+
+      - name: prime-cache-de91389
+        run: echo "Cache result: ${{ steps.cache-de91389.outputs.cache-hit }}"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
